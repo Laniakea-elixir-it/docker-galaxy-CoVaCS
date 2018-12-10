@@ -6,8 +6,18 @@ ENV container docker
 
 COPY ["playbook.yaml","/"]
 
-RUN ansible-galaxy install indigo-dc.galaxycloud-tools
-RUN ansible-galaxy install indigo-dc.galaxycloud-tooldeps
+# Install tools
+ADD https://raw.githubusercontent.com/Laniakea-elixir-it/Scripts/master/galaxy_tools/install_tools.docker.sh /tmp/install_tools.sh
+RUN chmod +x /tmp/install_tools.sh
+
+RUN wget https://raw.githubusercontent.com/indigo-dc/Galaxy-flavors-recipes/master/galaxy-CoVaCS/galaxy-CoVaCS-tool-list-1.yml  -O /tmp/tools1.yml
+RUN wget https://raw.githubusercontent.com/indigo-dc/Galaxy-flavors-recipes/master/galaxy-CoVaCS/galaxy-CoVaCS-tool-list-2.yml  -O /tmp/tools2.yml
+
+RUN /tmp/install_tools.sh GALAXY_ADMIN_API_KEY /tmp/tools1.yml && \
+    /export/tool_deps/_conda/bin/conda clean --tarballs --yes > /dev/null && \
+    /tmp/install_tools.sh GALAXY_ADMIN_API_KEY /tmp/tools2.yml && \
+    /export/tool_deps/_conda/bin/conda clean --tarballs --yes > /dev/null
+
 RUN ansible-galaxy install indigo-dc.cvmfs-client
 RUN ansible-galaxy install indigo-dc.galaxycloud-refdata
 
