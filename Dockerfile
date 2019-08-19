@@ -22,6 +22,8 @@ RUN install-tools $GALAXY_ROOT/tools2.yaml && \
     rm /export/galaxy-central/ -rf
 
 # Install workflows
+RUN mkdir -p $GALAXY_HOME/workflows
+
 RUN wget https://raw.githubusercontent.com/indigo-dc/Galaxy-flavors-recipes/master/galaxy-CoVaCS/galaxy-CoVaCS-workflows/Galaxy-Workflow-CoVaCS.ga -O $GALAXY_HOME/workflows/Galaxy-Workflow-CoVaCS.ga
 RUN wget https://raw.githubusercontent.com/indigo-dc/Galaxy-flavors-recipes/master/galaxy-CoVaCS/galaxy-CoVaCS-workflows/Galaxy-Workflow-covacs_wf_Select_variant.ga -O $GALAXY_HOME/workflows/Galaxy-Workflow-covacs_wf_Select_variant.ga
 
