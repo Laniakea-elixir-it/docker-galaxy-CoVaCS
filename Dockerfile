@@ -1,35 +1,37 @@
-FROM laniakeacloud/galaxy:18.05
+# Galaxy - CoVaCS
 
-MAINTAINER ma.tangaro@ibiom.cnr.it
+FROM bgruening/galaxy-stable:19.01
 
-ENV container docker
+MAINTAINER Tangaro Marco Antonio, ma.tangaro@ibiom.cnr.it
 
-COPY ["playbook.yaml","/"]
+ENV GALAXY_CONFIG_BRAND="CoVaCS"
 
-# Install tools
-ADD https://raw.githubusercontent.com/Laniakea-elixir-it/Scripts/master/galaxy_tools/install_tools.docker.sh /tmp/install_tools.sh
-RUN chmod +x /tmp/install_tools.sh
+WORKDIR /galaxy-central
 
-RUN wget https://raw.githubusercontent.com/indigo-dc/Galaxy-flavors-recipes/master/galaxy-CoVaCS/galaxy-CoVaCS-tool-list-1.yml  -O /tmp/tools1.yml
-RUN wget https://raw.githubusercontent.com/indigo-dc/Galaxy-flavors-recipes/master/galaxy-CoVaCS/galaxy-CoVaCS-tool-list-2.yml  -O /tmp/tools2.yml
+RUN add-tool-shed --url 'http://testtoolshed.g2.bx.psu.edu/' --name 'Test Tool Shed'
 
-RUN /tmp/install_tools.sh GALAXY_ADMIN_API_KEY /tmp/tools1.yml && \
-    /export/tool_deps/_conda/bin/conda clean --tarballs --yes > /dev/null && \
-    /tmp/install_tools.sh GALAXY_ADMIN_API_KEY /tmp/tools2.yml && \
-    /export/tool_deps/_conda/bin/conda clean --tarballs --yes > /dev/null
+RUN wget https://raw.githubusercontent.com/indigo-dc/Galaxy-flavors-recipes/master/galaxy-CoVaCS/galaxy-CoVaCS-tool-list-1.yml -O $GALAXY_ROOT/tools1.yml
+RUN wget https://raw.githubusercontent.com/indigo-dc/Galaxy-flavors-recipes/master/galaxy-CoVaCS/galaxy-CoVaCS-tool-list-2.yml -O $GALAXY_ROOT/tools2.yml
 
-RUN ansible-galaxy install indigo-dc.cvmfs-client
-RUN ansible-galaxy install indigo-dc.galaxycloud-refdata
+RUN install-tools $GALAXY_ROOT/tools1.yaml && \
+    /tool_deps/_conda/bin/conda clean --tarballs --yes > /dev/null && \
+    rm /export/galaxy-central/ -rf
 
-# Download refdata configuration file
-ADD https://raw.githubusercontent.com/indigo-dc/Reference-data-galaxycloud-repository/master/cvmfs_server_keys/elixir-italy.covacs.refdata.pub /tmp/elixir-italy.covacs.refdata.pub
-ADD https://raw.githubusercontent.com/indigo-dc/Reference-data-galaxycloud-repository/master/cvmfs_server_config_files/elixir-italy.covacs.refdata.conf /tmp/elixir-italy.covacs.refdata.conf
+RUN install-tools $GALAXY_ROOT/tools2.yaml && \
+    /tool_deps/_conda/bin/conda clean --tarballs --yes > /dev/null && \
+    rm /export/galaxy-central/ -rf
 
-RUN echo "localhost" > /etc/ansible/hosts
+#TODO
+#Install workflows
+# change cvmfs setup
 
-# Install tools and configure cvmfs reference data
-RUN ansible-playbook /playbook.yaml
+# Mark folders as imported from the host.
+VOLUME ["/export/", "/data/", "/var/lib/docker"]
 
-# This overwrite docker-galaxy CMD line
-# Mount cvmfs and start galaxy
-CMD /bin/mount -t cvmfs elixir-italy.covacs.refdata /cvmfs/elixir-italy.covacs.refdata; /usr/local/bin/galaxy-startup; /usr/bin/sleep infinity
+# Expose port 80 (webserver), 21 (FTP server), 8800 (Proxy)
+EXPOSE :80
+EXPOSE :21
+EXPOSE :8800
+
+# Autostart script that is invoked during container start
+CMD ["/usr/bin/startup"]
