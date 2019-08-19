@@ -10,8 +10,8 @@ WORKDIR /galaxy-central
 
 RUN add-tool-shed --url 'http://testtoolshed.g2.bx.psu.edu/' --name 'Test Tool Shed'
 
-RUN wget https://raw.githubusercontent.com/indigo-dc/Galaxy-flavors-recipes/master/galaxy-CoVaCS/galaxy-CoVaCS-tool-list-1.yml -O $GALAXY_ROOT/tools1.yml
-RUN wget https://raw.githubusercontent.com/indigo-dc/Galaxy-flavors-recipes/master/galaxy-CoVaCS/galaxy-CoVaCS-tool-list-2.yml -O $GALAXY_ROOT/tools2.yml
+RUN wget https://raw.githubusercontent.com/indigo-dc/Galaxy-flavors-recipes/master/galaxy-CoVaCS/galaxy-CoVaCS-tool-list-1.yml -O $GALAXY_ROOT/tools1.yaml
+RUN wget https://raw.githubusercontent.com/indigo-dc/Galaxy-flavors-recipes/master/galaxy-CoVaCS/galaxy-CoVaCS-tool-list-2.yml -O $GALAXY_ROOT/tools2.yaml
 
 RUN install-tools $GALAXY_ROOT/tools1.yaml && \
     /tool_deps/_conda/bin/conda clean --tarballs --yes > /dev/null && \
