@@ -5,12 +5,6 @@ FROM bgruening/galaxy-stable:19.01
 MAINTAINER Tangaro Marco Antonio, ma.tangaro@ibiom.cnr.it
 
 ENV GALAXY_CONFIG_BRAND="CoVaCS"
-ENV GALAXY_CONFIG_REQUIRE_LOGIN=true
-ENV GALAXY_CONFIG_ALLOW_USER_CREATION=true
-ENV GALAXY_CONFIG_ALLOW_USER_IMPERSONATION=true
-ENV GALAXY_CONFIG_NEW_USER_DATASET_ACCESS_ROLE_DEFAULT_PRIVATE=true
-ENV GALAXY_CONFIG_CONDA_AUTO_INIT=true
-ENV GALAXY_CONFIG_CONDA_AUTO_INSTALL=true
 
 RUN wget https://raw.githubusercontent.com/indigo-dc/Reference-data-galaxycloud-repository/master/elixir-italy.covacs.refdata/location/tool_data_table_conf.xml -O /etc/galaxy/tool_data_table_conf.xml
 
